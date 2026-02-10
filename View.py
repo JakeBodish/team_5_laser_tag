@@ -65,32 +65,3 @@ class Screen():
             pass
 
         pygame.display.flip()
-
-
-class Controller:
-    def __init__(self):
-        self.running = True
-
-    def update(self):
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                self.running = False
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
-
-
-
-
-
-
-
-#main program
-pygame.init()
-view = Screen()
-controller = Controller()
-
-while(controller.running):
-    view.update()
-    controller.update()
-    sleep(0.04)
