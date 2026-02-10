@@ -2,7 +2,7 @@ import pygame
 from pygame.locals import*
 from time import sleep
 
-class Screen():
+class Screen(): #testing commiting from terminal
     SCREEN_SIZE = (800,800)
     def __init__(self):
         self.screen = pygame.display.set_mode(Screen.SCREEN_SIZE,)
