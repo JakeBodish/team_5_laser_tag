@@ -63,7 +63,7 @@ class Screen():
             for text in self.entry_text:
                 self.screen.blit(text[0], text[1])
         else: 
-            # Write code for the Splash Screen
+            #Prints scaled Splash Screen image, waits 3s and updates entry_screen
             self.screen.blit(self.scaled_img, (0, 0))
             sleep(3)
             self.entry_screen = True
