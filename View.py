@@ -6,7 +6,7 @@ class Screen():
     SCREEN_SIZE = (800,800)
     def __init__(self):
         self.screen = pygame.display.set_mode(Screen.SCREEN_SIZE,)
-        self.entry_screen = True
+        self.entry_screen = False
         self.red_team_entry = []
         self.green_team_entry = []
         self.entry_text = []
@@ -15,6 +15,8 @@ class Screen():
         self.entry_box_height = 25
         self.init_entry_arrays()
         self.init_entry_text()
+        self.img = pygame.image.load('splash_screen.jpg')
+        self.scaled_img = pygame.transform.scale(self.img, (800, 800))
 
     def init_entry_arrays(self): # initalizes the red and green team entry screen arrays
          for i in range(self.entry_rows):
@@ -61,7 +63,9 @@ class Screen():
             for text in self.entry_text:
                 self.screen.blit(text[0], text[1])
         else: 
-            # Write code for the Splash Screen
-            pass
+            #Prints scaled Splash Screen image, waits 3s and updates entry_screen
+            self.screen.blit(self.scaled_img, (0, 0))
+            sleep(3)
+            self.entry_screen = True
 
         pygame.display.flip()
