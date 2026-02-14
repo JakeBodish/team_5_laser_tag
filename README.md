@@ -12,9 +12,4 @@ micahlivingston | Micah Livingston
 
 Sprint2:  
 	1) Run main.py
-	
-	To see how UDP communicate:  
-	1) run trafficgenerator.py and input random, but different equipment IDs for each player  
-	2) run gameserver.py  
-	3) most output will be from trafficgenerator.py for now  
-	
+	2) Enter players
