@@ -58,5 +58,4 @@ class Screen(): #testing commiting from terminal
         #draw the player info on entry screen
         self.model.draw_player_entries(self.screen)
 
-    def draw_entry_text(self):
         
