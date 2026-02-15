@@ -1,6 +1,7 @@
 #hi
 # model.py
 import sqlite3
+import pygame
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
@@ -19,6 +20,11 @@ class Model:
         self.db_path = db_path
         #creates table if not there
         self._init_db()
+
+        #Teams
+        self.red_team = {23 : 11111111}
+        self.green_team = {11 : 2020404}
+
     def _connect(self):
         #connection to database
         return sqlite3.connect(self.db_path)
@@ -84,3 +90,31 @@ class Model:
             cur = con.cursor()
             cur.execute("DELETE FROM players")
             con.commit()
+
+    def draw_player_entries(self, screen):
+        font = pygame.font.SysFont("Arial", 16)
+        y = 105
+        i = 0
+        for key, value in self.red_team.items():
+            number = font.render(str(i), True, (255, 255, 255))
+            hardware = font.render(str(key), True, (255, 255, 255))
+            playerID = font.render(str(value), True, (255, 255, 255))
+            screen.blit(number, (80, y))
+            screen.blit(hardware, (115, y)) 
+            screen.blit(playerID, (190, y))
+            y += 25
+            i += 1
+
+        # reset variables    
+        y = 105
+        i = 0
+
+        for key, value in self.green_team.items():
+            number = font.render(str(i), True, (255, 255, 255))
+            hardware = font.render(str(key), True, (255, 255, 255))
+            playerID = font.render(str(value), True, (255, 255, 255))
+            screen.blit(number, (480, y))
+            screen.blit(hardware, (515, y)) 
+            screen.blit(playerID, (590, y))
+            y += 25
+            i += 1

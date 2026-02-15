@@ -8,43 +8,45 @@ from pygame.locals import*
 import threading
 
 class Controller():
-	def __init__(self):
-		self.running  = True
-		#true when game running
-		self.in_progress = False
-		
-		# Network configuration
-		self.serverIP = "0.0.0.0"
-		self.incomingPort = 7501
-		self.outgoingPort = 7500
-		self.bufferSize  = 1024
+    def __init__(self, v, m):
+        self.running  = True
+        self.view = v
+        self.model = m
+        #true when game running
+        self.in_progress = False
+        
+        # Network configuration
+        self.serverIP = "0.0.0.0"
+        self.incomingPort = 7501
+        self.outgoingPort = 7500
+        self.bufferSize  = 1024
 
-		# Sockets
-		#incoming socket
-		self.UDPIncomingSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-		self.UDPIncomingSocket.bind((self.serverIP, self.incomingPort)) # Bind incoming socket to an IP
+        # Sockets
+        #incoming socket
+        self.UDPIncomingSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.UDPIncomingSocket.bind((self.serverIP, self.incomingPort)) # Bind incoming socket to an IP
 
-		#outgoing socket
-		self.UDPOutgoingSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
-		self.UDPOutgoingSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1) # Enable broadcast on outgoing socket
-		
-		# Thread to constantly listen to data and then store in data buffer.
-		self.data_in_buffer = queue.Queue()
-		self.stop_event = threading.Event()
-		self.listener = threading.Thread(target=self.listen, daemon=True)
+        #outgoing socket
+        self.UDPOutgoingSocket = socket.socket(family=socket.AF_INET, type=socket.SOCK_DGRAM)
+        self.UDPOutgoingSocket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1) # Enable broadcast on outgoing socket
 
-		#input flags
-		self.request_start = False
-		self.request_add = False
-		self.request_delete = False
-		self.request_wipe = False
+        # Thread to constantly listen to data and then store in data buffer.
+        self.data_in_buffer = queue.Queue()
+        self.stop_event = threading.Event()
+        self.listener = threading.Thread(target=self.listen, daemon=True)
 
-		#IP change mode
-		self.ip_mode = False
-		self.ip_text = ""
+        #input flags
+        self.request_start = False
+        self.request_add = False
+        self.request_delete = False
+        self.request_wipe = False
 
-#event processing	
-	def process_events(self, events):
+        #IP change mode
+        self.ip_mode = False
+        self.ip_text = ""
+
+    #event processing	
+    def process_events(self, events):
         for event in events:
             if event.type == QUIT:
                 self.running = False
@@ -83,8 +85,8 @@ class Controller():
 
                 if event.key == K_DELETE:
                     self.request_delete = True
-		
-	#udp functions
+        
+    #udp functions
     def broadcast(self, msg):
         self.UDPOutgoingSocket.sendto(
             msg.encode(),
@@ -120,7 +122,7 @@ class Controller():
             except:
                 break
 
-	#network configuration
+    #network configuration
     def change_serverIP(self, new_ip):
         #allows user to change network binding address
         try:

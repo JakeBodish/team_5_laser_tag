@@ -6,7 +6,8 @@ class Screen:
 
 class Screen(): #testing commiting from terminal
     SCREEN_SIZE = (800,800)
-    def __init__(self):
+    def __init__(self, m):
+        self.model = m
         self.screen = pygame.display.set_mode(Screen.SCREEN_SIZE)
         #starts splash screen timer
         self.entry_screen = False
@@ -35,8 +36,9 @@ class Screen(): #testing commiting from terminal
             pygame.display.flip()
             return
 
-        #sraw entry screen
+        #draw entry screen
         self.draw_entries()
+        self.draw_entry_text()
         pygame.display.flip()
 
     def draw_entries(self):
@@ -52,3 +54,9 @@ class Screen(): #testing commiting from terminal
             pygame.draw.rect(self.screen, (0, 255, 0), (575, y, 125, 25), 2)
 
             y += 25
+        
+        #draw the player info on entry screen
+        self.model.draw_player_entries(self.screen)
+
+    def draw_entry_text(self):
+        

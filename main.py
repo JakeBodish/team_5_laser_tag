@@ -1,13 +1,13 @@
 import pygame
 from controller import Controller
-from view import Screen
+from View import Screen
 from model import Model
 
 def main():
     pygame.init()
-    view = Screen()
-    controller = Controller()
     model = Model()
+    view = Screen(model)
+    controller = Controller(view, model)
     clock = pygame.time.Clock()
 
     while controller.running:
