@@ -5,7 +5,7 @@ import pygame
 from pygame.locals import*
 from time import sleep
 from controller import Controller
-from View import Screen
+from view import Screen
 
 if __name__=="__main__":
 	pygame.init()
