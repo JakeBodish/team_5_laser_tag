@@ -22,8 +22,8 @@ class Model:
         self._init_db()
 
         #Teams
-        self.red_team = {23 : 11111111}
-        self.green_team = {11 : 2020404}
+        self.red_team = {}
+        self.green_team = {}
 
     def _connect(self):
         #connection to database
@@ -50,8 +50,14 @@ class Model:
         if equipment_id <= 0:
             return False, "Equipment ID must be a positive integer"
         if name == "":
-            return False, "Name cannot be empty"
+            return False, "Name cannot be empty"\
 
+        # Add player to the team
+        if(team == "RED"):
+            self.red_team[equipment_id] = name
+        else:
+            self.green_team[equipment_id] = name
+        
         try:
             with self._connect() as con:
                 cur = con.cursor()
@@ -93,28 +99,29 @@ class Model:
 
     def draw_player_entries(self, screen):
         font = pygame.font.SysFont("Arial", 16)
-        y = 105
-        i = 0
-        for key, value in self.red_team.items():
-            number = font.render(str(i), True, (255, 255, 255))
-            hardware = font.render(str(key), True, (255, 255, 255))
-            playerID = font.render(str(value), True, (255, 255, 255))
-            screen.blit(number, (80, y))
-            screen.blit(hardware, (115, y)) 
-            screen.blit(playerID, (190, y))
-            y += 25
-            i += 1
+        if(len(self.red_team) != 0):
+            y = 105
+            i = 0
+            for key, value in self.red_team.items():
+                number = font.render(str(i), True, (255, 255, 255))
+                hardware = font.render(str(key), True, (255, 255, 255))
+                playerID = font.render(str(value), True, (255, 255, 255))
+                screen.blit(number, (80, y))
+                screen.blit(hardware, (115, y)) 
+                screen.blit(playerID, (190, y))
+                y += 25
+                i += 1
 
-        # reset variables    
-        y = 105
-        i = 0
+        if(len(self.green_team) != 0):
+            y = 105
+            i = 0
 
-        for key, value in self.green_team.items():
-            number = font.render(str(i), True, (255, 255, 255))
-            hardware = font.render(str(key), True, (255, 255, 255))
-            playerID = font.render(str(value), True, (255, 255, 255))
-            screen.blit(number, (480, y))
-            screen.blit(hardware, (515, y)) 
-            screen.blit(playerID, (590, y))
-            y += 25
-            i += 1
+            for key, value in self.green_team.items():
+                number = font.render(str(i), True, (255, 255, 255))
+                hardware = font.render(str(key), True, (255, 255, 255))
+                playerID = font.render(str(value), True, (255, 255, 255))
+                screen.blit(number, (480, y))
+                screen.blit(hardware, (515, y)) 
+                screen.blit(playerID, (590, y))
+                y += 25
+                i += 1
