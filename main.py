@@ -11,26 +11,22 @@ def main():
     clock = pygame.time.Clock()
 
     while controller.running:
+        view.update()
         events = pygame.event.get()
         controller.process_events(events)
         #start game
         if controller.request_start:
             controller.start()
             controller.request_start = False
-        #add player
-        if controller.request_add:
-            controller.request_add = False
-            model.add_player(1, "Test", "RED")
-            controller.broadcast_equipment(1)
         #wipe database
         if controller.request_wipe:
             controller.request_wipe = False
             controller.end()
             model.wipe_all()
 
-        view.update()
+        pygame.display.flip()
         clock.tick(25)
-
+    
     pygame.quit()
 
 if __name__ == "__main__":

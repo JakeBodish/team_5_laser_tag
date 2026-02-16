@@ -44,6 +44,9 @@ class Controller():
         #IP change mode
         self.ip_mode = False
         self.ip_text = ""
+        
+        # Input text buffer
+        self.usr_txt = ""
 
     #event processing	
     def process_events(self, events):
@@ -61,19 +64,57 @@ class Controller():
                 #if typing IP address
                 if self.ip_mode:
                     if event.key == K_RETURN:
-                        self.change_serverIP(self.ip_text)
+                        self.change_serverIP(self.ip_txt)
                         self.ip_mode = False
                     elif event.key == K_BACKSPACE:
-                        self.ip_text = self.ip_text[:-1]
+                        self.ip_txt = self.ip_txt[:-1]
                     else:
                         if event.unicode.isdigit() or event.unicode == ".":
-                            self.ip_text += event.unicode
+                            self.ip_txt += event.unicode
+                            
+                elif self.request_add:
+                    if event.key == K_RETURN:
+                        self.model.add_player_to_database(self.player_id, self.usr_txt)
+                        self.usr_txt = ""
+                        self.request_add = False
+                    elif event.key == K_BACKSPACE:
+                        self.usr_txt = self.usr_txt[:-1]
+                    else:
+                        self.usr_txt += event.unicode
+                        
+                elif not self.in_progress: # player entry
+                    if event.key == K_TAB: # Switch fields
+                        if self.view.col%2==0: # if in player_id col
+                            self.player_id = self.usr_txt
+                            name = self.model.get_player_name(self.player_id)
+                            if name == "None":
+                                self.request_add = True
+                            self.view.last_entry = self.player_id
+                        else: #if in equipment id col
+                            self.equipment_id = self.usr_txt
+                            self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
+                            self.broadcast(self.equipment_id)
+                        if self.view.col+1>=4:
+                            self.view.row = (self.view.row+1)%20
+                        self.view.col = (self.view.col+1)%4
+                        
+                        if self.view.col > 1:
+	                        self.view.team = "GREEN"
+                        else:
+	                        self.view.team = "RED"
+                        self.usr_txt = ""
+               
+                    elif event.key == K_BACKSPACE:
+                        self.usr_txt = self.usr_txt[:-1]
+                    else:
+                        if event.unicode.isdigit():
+                            self.usr_txt += event.unicode
+                    self.view.current_entry = self.usr_txt
 
             if event.type == KEYUP:
                 if event.key == K_F2:
                     self.ip_mode = True
-                    self.ip_text = ""
-
+                    self.ip_txt = ""
                 if event.key == K_F3:
                     self.request_start = True
 
@@ -85,17 +126,18 @@ class Controller():
 
                 if event.key == K_DELETE:
                     self.request_delete = True
-        
+        if self.ip_mode:
+            prompt = "Input a new IP. Press ENTER when done. ESCAPE to cancel:"
+            self.view.draw_prompt(prompt, self.ip_txt)
+        if self.request_add:
+            prompt = "New Player ID detected, input new Player name. Press ENTER when done:"
+            self.view.draw_prompt(prompt, self.usr_txt)
     #udp functions
     def broadcast(self, msg):
         self.UDPOutgoingSocket.sendto(
             msg.encode(),
             ("255.255.255.255", self.outgoingPort),
         )
-
-    def broadcast_equipment(self, equipment_id):
-        #broadcast equipment code after adds player
-        self.broadcast(f"EQ:{equipment_id}")
 
     def start(self):
         #broadcast game start code
