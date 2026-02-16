@@ -38,7 +38,6 @@ class Screen(): #testing commiting from terminal
 
         #draw entry screen
         self.draw_entries()
-        self.draw_entry_text()
         pygame.display.flip()
 
     def draw_entries(self):
