@@ -16,3 +16,7 @@ Sprint2:
 3. If it is a new player, you will be prompted to enter a new codename 
 4. Enter the equipment ID for the player, hit TAB 
 5. Press F2 to configure server IP 
+
+players.db starts with two players: 
+98 | bobby
+99 | billy
