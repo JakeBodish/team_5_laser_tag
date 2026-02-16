@@ -87,7 +87,11 @@ class Controller():
                         if self.view.col%2==0: # if in player_id col
                             self.player_id = self.usr_txt
                             name = self.model.get_player_name(self.player_id)
+<<<<<<< Updated upstream
                             if name == "None":
+=======
+                            if name == "None" or name == "":
+>>>>>>> Stashed changes
                                 self.request_add = True
                             self.view.last_entry = self.player_id
                         else: #if in equipment id col
