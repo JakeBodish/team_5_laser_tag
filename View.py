@@ -11,6 +11,7 @@ class Screen(): #testing commiting from terminal
         self.screen = pygame.display.set_mode(Screen.SCREEN_SIZE)
         #starts splash screen timer
         self.entry_screen = False
+        self.play_screen = False
         self.start_time = pygame.time.get_ticks()
         #loads splash screen image
         self.img = pygame.image.load("splash_screen.jpg")
@@ -18,6 +19,7 @@ class Screen(): #testing commiting from terminal
         #entry data storage
         self.red_players = [{"player_id": "", "equipment_id": ""} for _ in range(20)]
         self.green_players = [{"player_id": "", "equipment_id": ""} for _ in range(20)]
+        self.entry_screen_options = []
         #current selection
         self.team = "RED"
         self.current_entry = ""
@@ -26,27 +28,35 @@ class Screen(): #testing commiting from terminal
         self.col = 0
         self.font = pygame.font.SysFont(None, 24)
 
+        #Initilize text
+        self.init_entry_options()
+
     #draw screen
     def update(self):
         self.screen.fill((0, 0, 0))
 
         #splash screen for first 3 seconds
-        if not self.entry_screen:
+        if not self.entry_screen and not self.play_screen:
             self.screen.blit(self.img, (0, 0))
             if pygame.time.get_ticks() - self.start_time > 3000:
                 self.entry_screen = True
             pygame.display.flip()
             return
 
-        #draw entry screen
-        self.draw_entries()
+        elif self.entry_screen and not self.play_screen:
+            #draw entry screen
+            self.draw_entries()
+            self.draw_potential_actions()
+
+        elif not self.entry_screen and self.play_screen:
+            #Draw play_screen
+            self.draw_action_screen()
         
 
     def draw_entries(self):
         y = 100
-        font = pygame.font.SysFont("Arial", 16)
-        player_id_col = font.render("Player ID:", True, (255,255,255))
-        equip_id_col = font.render("Equipment ID:", True, (255,255,255))
+        player_id_col = self.font.render("Player ID:", True, (255,255,255))
+        equip_id_col = self.font.render("Equipment ID:", True, (255,255,255))
         self.screen.blit(player_id_col, (100,84))
         self.screen.blit(player_id_col, (500,84))
         self.screen.blit(equip_id_col, (175,84))
@@ -70,8 +80,8 @@ class Screen(): #testing commiting from terminal
             y = 105
             for key, player in self.model.red_team.items():
                 player_id, _ = player
-                hardware = font.render(str(key), True, (255, 255, 255))
-                playerID = font.render(str(player_id), True, (255, 255, 255))
+                hardware = self.font.render(str(key), True, (255, 255, 255))
+                playerID = self.font.render(str(player_id), True, (255, 255, 255))
                 
                 self.screen.blit(playerID, (115, y))
                 self.screen.blit(hardware, (190, y)) 
@@ -81,16 +91,16 @@ class Screen(): #testing commiting from terminal
             y = 105
             for key, player in self.model.green_team.items():
                 player_id, _ = player
-                hardware = font.render(str(key), True, (255, 255, 255))
-                playerID = font.render(str(player_id), True, (255, 255, 255))
+                hardware = self.font.render(str(key), True, (255, 255, 255))
+                playerID = self.font.render(str(player_id), True, (255, 255, 255))
                 
                 self.screen.blit(playerID, (515, y))
                 self.screen.blit(hardware, (590, y)) 
                 y += 25
         
         # Current entry
-        entry = font.render(str(self.current_entry), True, (255,255,255))
-        last_entry = font.render(str(self.last_entry), True, (255,255,255))
+        entry = self.font.render(str(self.current_entry), True, (255,255,255))
+        last_entry = self.font.render(str(self.last_entry), True, (255,255,255))
         if self.col == 0:
             entry_x = 115
         elif self.col == 1:
@@ -104,12 +114,44 @@ class Screen(): #testing commiting from terminal
         self.screen.blit(entry, (entry_x, entry_y ))
         if self.col % 2 == 1:
             self.screen.blit(last_entry, (entry_x-75, entry_y))
+
+    # Initalizes the text on entry screen and stores into an array to be printed
+    def init_entry_options(self):
+        add_player = self.font.render("1. Press A to add player", True, (255,255,255))
+        wipe_players = self.font.render("2. Press F12 to clear all entries", True, (255,255,255))
+        action_screen = self.font.render("3. Press COMMA for action screen", True, (255,255,255))
+
+        self.entry_screen_options.append(add_player)
+        self.entry_screen_options.append(wipe_players)
+        self.entry_screen_options.append(action_screen)
+    
+    # Prints the text for action on player entry screen
+    def draw_potential_actions(self):
+        y = 625
+        for option in self.entry_screen_options:
+            self.screen.blit(option,(15, y))
+            y += 15
         
+       
+
+
     def draw_prompt(self, prompt: str, usr_input: str):
         y = 35
-        font = pygame.font.SysFont("Arial", 16)
         pygame.draw.rect(self.screen, (100, 100, 100), (150, y, 550, 45), 4)
-        prompt_ren = font.render(prompt, True, (255,255,255))
-        usr_input_ren = font.render(usr_input, True, (255,255,255))
+        prompt_ren = self.font.render(prompt, True, (255,255,255))
+        usr_input_ren = self.font.render(usr_input, True, (255,255,255))
         self.screen.blit(prompt_ren, (160,y+5))
         self.screen.blit(usr_input_ren, (165,y+26))
+
+    #Draws action screen
+    def draw_action_screen(self):
+        # RED and GREEN title at top of screen
+        red_title = self.font.render("RED TEAM", True, (255,255,255))
+        green_title = self.font.render("GREEN TEAM", True, (255,255,255))
+        self.screen.blit(red_title, (100, 10))
+        self.screen.blit(green_title, (600, 10))
+
+
+
+
+        pygame.display.flip()

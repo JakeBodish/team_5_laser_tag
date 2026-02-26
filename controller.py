@@ -117,6 +117,11 @@ class Controller():
                     self.ip_txt = ""
                 if event.key == K_F3:
                     self.request_start = True
+                
+                if event.key == K_COMMA:
+                    if(self.view.entry_screen):
+                        self.view.entry_screen = False
+                        self.view.play_screen = True
 
                 if event.key == K_F12:
                     self.request_wipe = True
