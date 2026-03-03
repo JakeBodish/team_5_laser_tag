@@ -107,7 +107,10 @@ class Model:
         time_remaining = int((self.time_left - (current_time - self.start_time)) / 1000)
         minutes = int((time_remaining) / 60)
         seconds = time_remaining % 60
-        return (str(minutes) + ":" + str(seconds))
+        if seconds < 10:
+            return (str(minutes) + ":0" + str(seconds))
+        else: 
+            return (str(minutes) + ":" + str(seconds))
 
     #update function
     def update(self):
