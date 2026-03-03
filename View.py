@@ -151,7 +151,18 @@ class Screen(): #testing commiting from terminal
         self.screen.blit(red_title, (100, 10))
         self.screen.blit(green_title, (600, 10))
 
+        #Draw Rectangles
+        pygame.draw.rect(self.screen, (255, 255, 255), (0, 0, 800, 395), 4)
+        pygame.draw.rect(self.screen, (255, 255, 255), (0, 405, 800, 350), 4)
 
+        #Draw Rectangle Titles
+        score_title = self.font.render("Current Scores", True, (255,255,255))
+        action_title = self.font.render("Current Game Action", True, (255,255,255))
+        self.screen.blit(score_title, (335, 10))
+        self.screen.blit(action_title, (325, 415))
 
+        #Draw Time Remaining:
+        time_title = self.font.render("Time Remaining: ", True, (255,255,255))
+        self.screen.blit(time_title, (600, 770))
 
         pygame.display.flip()
