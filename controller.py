@@ -122,6 +122,8 @@ class Controller():
                     if(self.view.entry_screen):
                         self.view.entry_screen = False
                         self.view.play_screen = True
+                        self.model.playing = False
+                        self.model.start_30s_timer = True
 
                 if event.key == K_F12:
                     self.request_wipe = True

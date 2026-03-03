@@ -161,8 +161,10 @@ class Screen(): #testing commiting from terminal
         self.screen.blit(score_title, (335, 10))
         self.screen.blit(action_title, (325, 415))
 
-        #Draw Time Remaining:
-        time_title = self.font.render("Time Remaining: ", True, (255,255,255))
-        self.screen.blit(time_title, (600, 770))
+        #calculate time left in game
+        time_left = self.model.get_time_left()
+        time_text = ("Time Remaining: " + str(time_left))
+        time_title = self.font.render(time_text, True, (255,255,255))
+        self.screen.blit(time_title, (550, 760))
 
         pygame.display.flip()

@@ -25,6 +25,12 @@ class Model:
         self.red_team = {}
         self.green_team = {}
 
+        #Timer and Game settings
+        self.start_30s_timer = True
+        self.playing = True
+        self.start_time = 0
+        self.time_left = 0
+
     def _connect(self):
         #connection to database
         return sqlite3.connect(self.db_path)
@@ -94,3 +100,40 @@ class Model:
             cur = con.cursor()
             cur.execute("DELETE FROM players")
             con.commit()
+    
+    # A function so the View can grab the amount of time left in the game
+    def get_time_left(self):
+        current_time = pygame.time.get_ticks()
+        time_remaining = int((self.time_left - (current_time - self.start_time)) / 1000)
+        minutes = int((time_remaining) / 60)
+        seconds = time_remaining % 60
+        return (str(minutes) + ":" + str(seconds))
+
+    #update function
+    def update(self):
+        #Start 30 second timer before entering game
+        if(self.start_30s_timer and not self.playing):
+            self.start_time = pygame.time.get_ticks()
+            self.time_left = 30000 #30 seconds
+            self.start_30s_timer = False
+            print("Set 30 second timer")
+            return
+
+        #Calculate difference between current time and start time to see how much time has passed
+        current_time = pygame.time.get_ticks()
+        if(current_time - self.start_time > self.time_left):
+            if(not self.start_30s_timer and not self.playing):
+                print("30 seconds is up")
+                self.playing = True
+                self.start_time = pygame.time.get_ticks()
+                self.time_left = 360000
+            elif(not self.start_30s_timer and self.playing):
+                print("game is over")
+                self.playing = True
+                self.start_30s_timer = True
+
+        
+
+
+        
+        

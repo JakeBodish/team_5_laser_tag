@@ -24,9 +24,9 @@ def main():
             controller.end()
             model.wipe_all()
 
+        model.update()
         pygame.display.flip()
         clock.tick(25)
-    
     pygame.quit()
 
 if __name__ == "__main__":
