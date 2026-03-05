@@ -56,11 +56,11 @@ class Screen(): #testing commiting from terminal
     def draw_entries(self):
         y = 100
         player_id_col = self.font.render("Player ID:", True, (255,255,255))
-        equip_id_col = self.font.render("Equipment ID:", True, (255,255,255))
+        name_id_col = self.font.render("Codename:", True, (255,255,255))
         self.screen.blit(player_id_col, (100,84))
         self.screen.blit(player_id_col, (500,84))
-        self.screen.blit(equip_id_col, (175,84))
-        self.screen.blit(equip_id_col, (575,84))
+        self.screen.blit(name_id_col, (180,84))
+        self.screen.blit(name_id_col, (580,84))
         
         # boxes
         for i in range(20):
@@ -79,51 +79,51 @@ class Screen(): #testing commiting from terminal
         if(len(self.model.red_team) != 0):
             y = 105
             for key, player in self.model.red_team.items():
-                player_id, _ = player
-                hardware = self.font.render(str(key), True, (255, 255, 255))
+                player_id, name = player
+                name = self.font.render(str(name), True, (255, 255, 255))
                 playerID = self.font.render(str(player_id), True, (255, 255, 255))
                 
                 self.screen.blit(playerID, (115, y))
-                self.screen.blit(hardware, (190, y)) 
+                self.screen.blit(name, (190, y)) 
                 y += 25
 
         if(len(self.model.green_team) != 0):
             y = 105
             for key, player in self.model.green_team.items():
-                player_id, _ = player
-                hardware = self.font.render(str(key), True, (255, 255, 255))
+                player_id, name = player
+                name = self.font.render(str(name), True, (255, 255, 255))
                 playerID = self.font.render(str(player_id), True, (255, 255, 255))
                 
                 self.screen.blit(playerID, (515, y))
-                self.screen.blit(hardware, (590, y)) 
+                self.screen.blit(name, (590, y)) 
                 y += 25
         
         # Current entry
         entry = self.font.render(str(self.current_entry), True, (255,255,255))
-        last_entry = self.font.render(str(self.last_entry), True, (255,255,255))
+        #last_entry = self.font.render(str(self.last_entry), True, (255,255,255))
         if self.col == 0:
             entry_x = 115
-        elif self.col == 1:
-            entry_x = 190
-        elif self.col == 2:
+        else:
             entry_x = 515
-        elif self.col == 3:
-            entry_x = 590
         entry_y =105 + self.row*25
         pygame.draw.rect(self.screen, (255, 255, 0), (entry_x-15, entry_y-5, 75, 25), 2)
         self.screen.blit(entry, (entry_x, entry_y ))
-        if self.col % 2 == 1:
-            self.screen.blit(last_entry, (entry_x-75, entry_y))
+        #if self.col % 2 == 1:
+         #   self.screen.blit(last_entry, (entry_x-75, entry_y))
 
     # Initalizes the text on entry screen and stores into an array to be printed
     def init_entry_options(self):
-        add_player = self.font.render("1. Press A to add player", True, (255,255,255))
-        wipe_players = self.font.render("2. Press F12 to clear all entries", True, (255,255,255))
-        action_screen = self.font.render("3. Press COMMA for action screen", True, (255,255,255))
-
+        add_player = self.font.render("1. Enter playerID then hit TAB to enter equipment ID", True, (255,255,255))
+        config_network = self.font.render("2. Press F2 to configure server IP", True, (255,255,255))
+        wipe_players = self.font.render("3. Press F12 to clear all entries", True, (255,255,255))
+        action_screen = self.font.render("4. Press COMMA for action screen and game start", True, (255,255,255))
+        exit_game = self.font.render("5. Press ESC to exit the program", True, (255,255,255))
+        
         self.entry_screen_options.append(add_player)
+        self.entry_screen_options.append(config_network)
         self.entry_screen_options.append(wipe_players)
         self.entry_screen_options.append(action_screen)
+        self.entry_screen_options.append(exit_game)
     
     # Prints the text for action on player entry screen
     def draw_potential_actions(self):

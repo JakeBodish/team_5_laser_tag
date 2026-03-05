@@ -21,7 +21,7 @@ class Model:
         #creates table if not there
         self._init_db()
 
-        #Teams
+        #Teams hardwareID:(playerID, codename)
         self.red_team = {}
         self.green_team = {}
 
@@ -79,7 +79,7 @@ class Model:
         #delete player by ID
         with self._connect() as con:
             cur = con.cursor()
-            cur.execute("delete from players where equipment_id = ?", (equipment_id,))
+            cur.execute("delete from players where equipment_id =  ?", (equipment_id,))
             con.commit()
             return cur.rowcount > 0
 
@@ -88,18 +88,15 @@ class Model:
         with self._connect() as con:
             cur = con.cursor()
             try:
-                cur.execute("SELECT name from players where player_id = ?", (player_id))
-            except:
-                return ""
+                cur.execute("SELECT name from players where player_id =  ?", (player_id,))
+            except Exception as e:
+                print(e)
             name = str(cur.fetchone())
-        return name
+        return name.strip("()'',")
 
     def wipe_all(self):
-        #removes all players from database
-        with self._connect() as con:
-            cur = con.cursor()
-            cur.execute("DELETE FROM players")
-            con.commit()
+        self.red_team = {}
+        self.green_team = {}
     
     # A function so the View can grab the amount of time left in the game
     def get_time_left(self):
@@ -132,7 +129,7 @@ class Model:
                 self.time_left = 360000
             elif(not self.start_30s_timer and self.playing):
                 print("game is over")
-                self.playing = True
+                self.playing = False
                 self.start_30s_timer = True
 
         
