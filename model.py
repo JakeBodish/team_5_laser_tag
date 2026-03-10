@@ -111,6 +111,13 @@ class Model:
             return (str(minutes) + ":0" + str(seconds))
         else: 
             return (str(minutes) + ":" + str(seconds))
+        
+    #A function to clear all player entries on player entry screen -> f12
+    def clear_player_entries(self):
+        self.red_team.clear()
+        self.green_team.clear()
+        print("Players cleared")
+
 
     #update function
     def update(self):

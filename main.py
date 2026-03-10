@@ -22,6 +22,7 @@ def main():
         if controller.request_wipe:
             controller.request_wipe = False
             controller.end()
+            model.clear_player_entries()
             model.wipe_all()
 
         model.update()
