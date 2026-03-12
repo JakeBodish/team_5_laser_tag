@@ -18,3 +18,4 @@ Sprint3:
 5. Enter the equipment ID for the player 
 6. Press F2 to configure server IP 
 7. Press COMMA to enter action screen and begin game start countdown
+8. Press F12 to clear entries from player entry screen
