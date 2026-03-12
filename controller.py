@@ -10,6 +10,8 @@ import threading
 class Controller():
     def __init__(self, v, m):
         self.running  = True
+        self.request_start = False
+        self.request_wipe = False
         self.view = v
         self.model = m
         #true when game running
