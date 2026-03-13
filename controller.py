@@ -71,7 +71,7 @@ class Controller():
                 #if typing IP address
                 if self.ip_mode:
                     if event.key == K_RETURN:
-                        self.change_serverIP(self.ip_txt)
+                        self.change_serverIP(self.ip_text)
                         self.ip_mode = False
                     elif event.key == K_BACKSPACE:
                         self.ip_text = self.ip_text[:-1]
@@ -168,13 +168,13 @@ class Controller():
 
         if self.new_name:
             prompt = "New Player ID detected, input new codename. Press ENTER to save:"
-            self.view.draw_prompt(prompt, self.usr_txt)            
+            self.view.draw_prompt(prompt, self.usr_text)            
         elif self.equip_id:
             prompt = "Input the hardware ID for '" +  self.name +"'. Press ENTER when done:"
             self.view.draw_prompt(prompt, self.usr_txt)
         elif self.ip_mode:
             prompt = "Input a new IP. Press ENTER when done. ESCAPE to cancel:"
-            self.view.draw_prompt(prompt, self.ip_txt)
+            self.view.draw_prompt(prompt, self.ip_text)
         
         #Broadcast start code once 30s start timer is done:
         if self.model.playing and not self.in_progress:
