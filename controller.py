@@ -131,7 +131,7 @@ class Controller():
                     self.ip_mode = True
                     self.ip_txt = ""
                 
-                if event.key == K_COMMA:
+                if event.key == K_F5:
                     if(self.view.entry_screen):
                         self.view.entry_screen = False
                         self.view.play_screen = True
