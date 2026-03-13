@@ -49,6 +49,10 @@ class Controller():
         # Input text buffer
         self.usr_txt = ""
 
+		# player and equipment tracking
+		self.player_id = ""
+		self.equipment_id = ""
+
     #event processing	
     def process_events(self, events):
         for event in events:
@@ -59,8 +63,10 @@ class Controller():
                 if event.key == K_ESCAPE:
                     if self.ip_mode:
                         self.ip_mode = False
+						self.ip_text = ""
                     else:
                         self.running = False
+					continue
 
                 #if typing IP address
                 if self.ip_mode:
@@ -72,30 +78,36 @@ class Controller():
                     else:
                         if event.unicode.isdigit() or event.unicode == ".":
                             self.ip_txt += event.unicode
+					continue
                             
                 #if typing new codename
                 elif self.new_name: # This is True only when a new player is detected by the controller itself. Do not set True another way.
                     if event.key == K_RETURN:
                         self.name = self.usr_txt
-                        self.model.add_player_to_database(self.player_id, self.name)
-                        self.usr_txt = ""
-                        self.new_name = False
+						if self.name != "":
+                        	self.model.add_player_to_database(self.player_id, self.name)
+                       		self.usr_txt = ""
+                        	self.new_name = False
+							self.equip_id = True
                     elif event.key == K_BACKSPACE:
                         self.usr_txt = self.usr_txt[:-1]
                     else:
                         self.usr_txt += event.unicode
+					continue
                 #if typing equipment code
                 elif self.equip_id:
                     if event.key == K_RETURN:
                         self.equipment_id = self.usr_txt
-                        self.usr_txt = ""
-                        self.equip_id = False
-                        self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
-                        self.broadcast(self.equipment_id)
+						if self.equipment_id != "":
+	                        self.usr_txt = ""
+	                        self.equip_id = False
+	                        self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
+	                        self.broadcast(self.equipment_id)
+
+							self.view.current_entry = self.usr_txt
                         if self.view.col+1>=2:
                             self.view.row = (self.view.row+1)%20
                         self.view.col = (self.view.col+1)%2
-                        self.view.current_entry = self.usr_txt
                         if self.view.col == 1:
 	                        self.view.team = "GREEN"
                         else:
@@ -106,17 +118,21 @@ class Controller():
                     else:
                         if event.unicode.isdigit():
                             self.usr_txt += event.unicode
+					self.view.current_entry = self.usr._txt
+					continue
                 #if typing playerId, switching between fields in player entry   
                 elif self.view.entry_screen: # player entry
                     if event.key == K_TAB: # Switch fields
 						
                         self.player_id = self.usr_txt
-                        self.name = self.model.get_player_name(self.player_id)
-                        if self.name == "None":
-                            self.new_name = True
-                        self.view.last_entry = self.player_id
-                        self.equip_id = True
-                        self.usr_txt = ""
+						if self.player_id != "":
+                        	self.name = self.model.get_player_name(self.player_id)
+							self.view.last_entry = self.player_id
+							self.usr_txt = ""
+                        	if self.name == "None":
+                            	self.new_name = True
+							else:
+								self.equip_id = True
                         continue
                
                     elif event.key == K_BACKSPACE:
@@ -143,6 +159,12 @@ class Controller():
                         self.model.wipe_all() # Wipe teams
                         self.view.row = 0 # Reset index for player entry screen
                         self.view.col = 0
+						self.view.team = "RED"
+						self.view.current_entry = ""
+						self.view.last_entry = ""
+						self.usr_txt = ""
+						self.new_name = False
+						self.equip_id = False
 
         if self.new_name:
             prompt = "New Player ID detected, input new codename. Press ENTER to save:"
