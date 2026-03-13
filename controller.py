@@ -74,10 +74,10 @@ class Controller():
                         self.change_serverIP(self.ip_txt)
                         self.ip_mode = False
                     elif event.key == K_BACKSPACE:
-                        self.ip_txt = self.ip_txt[:-1]
+                        self.ip_text = self.ip_text[:-1]
                     else:
                         if event.unicode.isdigit() or event.unicode == ".":
-                            self.ip_txt += event.unicode
+                            self.ip_text += event.unicode
 					continue
                             
                 #if typing new codename
@@ -145,7 +145,7 @@ class Controller():
             if event.type == KEYUP:
                 if event.key == K_F2:
                     self.ip_mode = True
-                    self.ip_txt = ""
+                    self.ip_text = ""
                 
                 if event.key == K_F5:
                     if(self.view.entry_screen):
