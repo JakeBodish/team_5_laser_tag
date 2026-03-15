@@ -203,4 +203,3 @@ class Controller():
             self.UDPIncomingSocket.bind((self.serverIP, self.incomingPort))
         except:
             pass
-~
