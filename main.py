@@ -11,9 +11,9 @@ def main():
     clock = pygame.time.Clock()
 
     while controller.running:
+        view.update()
         events = pygame.event.get()
         controller.process_events(events)
-        model.update()
         #start game
         if controller.request_start:
             controller.start()
@@ -25,7 +25,7 @@ def main():
             model.clear_player_entries()
             model.wipe_all()
 
-        view.update()
+        model.update()
         pygame.display.flip()
         clock.tick(25)
     pygame.quit()
