@@ -160,6 +160,20 @@ class Screen(): #testing commiting from terminal
         self.screen.blit(score_title, (335, 10))
         self.screen.blit(action_title, (325, 415))
 
+         # Draw the currently entered players for each team on the action screen.
+        red_y = 45
+        for player_id, name in self.model.red_team.values():
+            red_text = self.font.render(str(name), True, (255,255,255))
+            self.screen.blit(red_text, (100, red_y))
+            red_y += 20
+
+        green_y = 45
+        for player_id, name in self.model.green_team.values():
+            green_text = self.font.render(str(name), True, (255,255,255))
+            self.screen.blit(green_text, (600, green_y))
+            green_y += 20
+
+
         #calculate time left in game
         time_left = self.model.get_time_left()
         time_text = ("Time Remaining: " + str(time_left))
