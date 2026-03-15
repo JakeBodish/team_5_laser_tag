@@ -51,8 +51,6 @@ class Screen(): #testing commiting from terminal
         elif not self.entry_screen and self.play_screen:
             #Draw play_screen
             self.draw_action_screen()
-            
-        pygame.display.flip()
 
     def draw_entries(self):
         y = 100
