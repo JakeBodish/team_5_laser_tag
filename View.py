@@ -99,7 +99,6 @@ class Screen(): #testing commiting from terminal
         
         # Current entry
         entry = self.font.render(str(self.current_entry), True, (255,255,255))
-        #last_entry = self.font.render(str(self.last_entry), True, (255,255,255))
         if self.col == 0:
             entry_x = 115
         else:
@@ -107,8 +106,6 @@ class Screen(): #testing commiting from terminal
         entry_y =105 + self.row*25
         pygame.draw.rect(self.screen, (255, 255, 0), (entry_x-15, entry_y-5, 75, 25), 2)
         self.screen.blit(entry, (entry_x, entry_y ))
-        #if self.col % 2 == 1:
-         #   self.screen.blit(last_entry, (entry_x-75, entry_y))
 
     # Initalizes the text on entry screen and stores into an array to be printed
     def init_entry_options(self):
@@ -130,9 +127,6 @@ class Screen(): #testing commiting from terminal
         for option in self.entry_screen_options:
             self.screen.blit(option,(15, y))
             y += 15
-        
-       
-
 
     def draw_prompt(self, prompt: str, usr_input: str):
         y = 35
@@ -163,13 +157,13 @@ class Screen(): #testing commiting from terminal
          # Draw the currently entered players for each team on the action screen.
         red_y = 45
         for player_id, name in self.model.red_team.values():
-            red_text = self.font.render(str(name), True, (255,255,255))
+            red_text = self.font.render(str(name), True, (255,0,0))
             self.screen.blit(red_text, (100, red_y))
             red_y += 20
 
         green_y = 45
         for player_id, name in self.model.green_team.values():
-            green_text = self.font.render(str(name), True, (255,255,255))
+            green_text = self.font.render(str(name), True, (0,255,0))
             self.screen.blit(green_text, (600, green_y))
             green_y += 20
 

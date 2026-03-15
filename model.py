@@ -46,16 +46,46 @@ class Model:
                 )
             """)
             con.commit()
-            
+
+    def check_if_player_already_exists(self, player_id: int, equipment_id: int):
+        for equip_id in self.red_team:
+            p_id = self.red_team[equip_id][0]
+            if player_id == p_id:
+                print("player already on red team!")
+                return False
+            if equip_id == equipment_id:
+                print("equipment number is already taken!")
+                return False
+
+        for equip_id in self.green_team:
+            p_id = self.green_team[equip_id][0]
+            if player_id == p_id:
+                print("player already on green team!")
+                return False
+            if equip_id == equipment_id:
+                print("equipment number is already taken!")
+                return False
+
+        return True
+
             
     #database operations
     def add_player_to_game(self, player_id: int, equipment_id: int, team: str):
 		#add player to game memory
         name = self.get_player_name(player_id)
         if team == "RED":
-            self.red_team[equipment_id] = (player_id,name)
+            if(self.check_if_player_already_exists(player_id, equipment_id)):
+                self.red_team[equipment_id] = (player_id,name)
+                return True
+            else:
+                return False
         else:
-            self.green_team[equipment_id] = (player_id,name)
+            if(self.check_if_player_already_exists(player_id, equipment_id)):
+                self.green_team[equipment_id] = (player_id,name)
+                return True
+            else:
+                return False
+
     def add_player_to_database(self, player_id: int, name: str):
         #add player_id and codename to database for future use
         if name == "":

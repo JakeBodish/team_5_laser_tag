@@ -90,16 +90,23 @@ class Controller():
                         self.equipment_id = self.usr_txt
                         self.usr_txt = ""
                         self.equip_id = False
-                        self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
-                        self.broadcast(self.equipment_id)
-                        if self.view.col+1>=2:
-                            self.view.row = (self.view.row+1)%20
-                        self.view.col = (self.view.col+1)%2
-                        self.view.current_entry = self.usr_txt
-                        if self.view.col == 1:
-	                        self.view.team = "GREEN"
+                        valid = self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
+                        if valid == True:
+                            self.broadcast(self.equipment_id)
+                            if self.view.col+1>=2:
+                                self.view.row = (self.view.row+1)%20
+                            self.view.col = (self.view.col+1)%2
+                            self.view.current_entry = self.usr_txt
+                            if self.view.col == 1:
+                                self.view.team = "GREEN"
+                            else:
+                                self.view.team = "RED"
                         else:
-	                        self.view.team = "RED"
+                            self.equip_id = False
+                            self.player_id = ""
+                            self.equipment_id = ""
+                            self.view.current_entry = ""
+                        
 
                     elif event.key == K_BACKSPACE:
                         self.usr_txt = self.usr_txt[:-1]
