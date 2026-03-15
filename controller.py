@@ -16,7 +16,7 @@ class Controller():
         self.model = m
         #true when game running
         self.in_progress = False
-        
+
         # Network configuration
         self.serverIP = "0.0.0.0"
         self.incomingPort = 7501
@@ -45,14 +45,10 @@ class Controller():
         #IP change mode
         self.ip_mode = False
         self.ip_text = ""
-        
+
         # Input text buffer
         self.usr_txt = ""
 
-        # player and equipment tracking
-        self.player_id = ""
-        self.equipment_id = ""
-		
     #event processing	
     def process_events(self, events):
         for event in events:
@@ -63,76 +59,66 @@ class Controller():
                 if event.key == K_ESCAPE:
                     if self.ip_mode:
                         self.ip_mode = False
-                        self.ip_text = ""
                     else:
                         self.running = False
-                    continue
 
                 #if typing IP address
                 if self.ip_mode:
                     if event.key == K_RETURN:
-                        self.change_serverIP(self.ip_text)
+                        self.change_serverIP(self.ip_txt)
                         self.ip_mode = False
                     elif event.key == K_BACKSPACE:
-                        self.ip_text = self.ip_text[:-1]
+                        self.ip_txt = self.ip_txt[:-1]
                     else:
                         if event.unicode.isdigit() or event.unicode == ".":
-                            self.ip_text += event.unicode
-                    continue
-                            
+                            self.ip_txt += event.unicode
+
                 #if typing new codename
                 elif self.new_name: # This is True only when a new player is detected by the controller itself. Do not set True another way.
                     if event.key == K_RETURN:
                         self.name = self.usr_txt
-                        if self.name != "":
-                            self.model.add_player_to_database(self.player_id, self.name)
-                            self.usr_txt = ""
-                            self.new_name = False
-                            self.equip_id = True
+                        self.model.add_player_to_database(self.player_id, self.name)
+                        self.usr_txt = ""
+                        self.new_name = False
                     elif event.key == K_BACKSPACE:
                         self.usr_txt = self.usr_txt[:-1]
                     else:
                         self.usr_txt += event.unicode
-                    continue
                 #if typing equipment code
                 elif self.equip_id:
                     if event.key == K_RETURN:
                         self.equipment_id = self.usr_txt
-                        if self.equipment_id != "":
-                            self.usr_txt = ""
-                            self.equip_id = False
-                            self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
-                            self.broadcast(self.equipment_id)
-                            self.view.current_entry = self.usr_txt
+                        self.usr_txt = ""
+                        self.equip_id = False
+                        self.model.add_player_to_game(self.player_id, self.equipment_id, self.view.team)
+                        self.broadcast(self.equipment_id)
                         if self.view.col+1>=2:
                             self.view.row = (self.view.row+1)%20
                         self.view.col = (self.view.col+1)%2
+                        self.view.current_entry = self.usr_txt
                         if self.view.col == 1:
-                            self.view.team = "GREEN"
+	                        self.view.team = "GREEN"
                         else:
-                            self.view.team = "RED"
+	                        self.view.team = "RED"
+
                     elif event.key == K_BACKSPACE:
                         self.usr_txt = self.usr_txt[:-1]
                     else:
                         if event.unicode.isdigit():
                             self.usr_txt += event.unicode
-                    self.view.current_entry = self.usr_txt
-                    continue
                 #if typing playerId, switching between fields in player entry   
                 elif self.view.entry_screen: # player entry
                     if event.key == K_TAB: # Switch fields
-						
+
                         self.player_id = self.usr_txt
-                        if self.player_id != "":
-                            self.name = self.model.get_player_name(self.player_id)
-                            self.view.last_entry = self.player_id
-                            self.usr_txt = ""
-                            if self.name is None:
-                                self.new_name = True
-                            else:
-                                self.equip_id = True
-                            continue
-               
+                        self.name = self.model.get_player_name(self.player_id)
+                        if self.name == "None":
+                            self.new_name = True
+                        self.view.last_entry = self.player_id
+                        self.equip_id = True
+                        self.usr_txt = ""
+                        continue
+
                     elif event.key == K_BACKSPACE:
                         self.usr_txt = self.usr_txt[:-1]
                     else:
@@ -143,8 +129,8 @@ class Controller():
             if event.type == KEYUP:
                 if event.key == K_F2:
                     self.ip_mode = True
-                    self.ip_text = ""
-                
+                    self.ip_txt = ""
+
                 if event.key == K_COMMA:
                     if(self.view.entry_screen):
                         self.view.entry_screen = False
@@ -157,12 +143,6 @@ class Controller():
                         self.model.wipe_all() # Wipe teams
                         self.view.row = 0 # Reset index for player entry screen
                         self.view.col = 0
-                        self.view.team = "RED"
-                        self.view.current_entry = ""
-                        self.view.last_entry = ""
-                        self.usr_txt = ""
-                        self.new_name = False
-                        self.equip_id = False
 
         if self.new_name:
             prompt = "New Player ID detected, input new codename. Press ENTER to save:"
@@ -172,13 +152,13 @@ class Controller():
             self.view.draw_prompt(prompt, self.usr_txt)
         elif self.ip_mode:
             prompt = "Input a new IP. Press ENTER when done. ESCAPE to cancel:"
-            self.view.draw_prompt(prompt, self.ip_text)
-        
+            self.view.draw_prompt(prompt, self.ip_txt)
+
         #Broadcast start code once 30s start timer is done:
         if self.model.playing and not self.in_progress:
             self.start()
-		
-        # Broadcast end game
+
+		#Broadcast end game
         elif not self.model.playing and self.in_progress:
             self.end()
     #udp functions
@@ -223,4 +203,4 @@ class Controller():
             self.UDPIncomingSocket.bind((self.serverIP, self.incomingPort))
         except:
             pass
-
+~
