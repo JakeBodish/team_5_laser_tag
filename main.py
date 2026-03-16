@@ -22,11 +22,12 @@ def main():
         if controller.request_wipe:
             controller.request_wipe = False
             controller.end()
+            model.clear_player_entries()
             model.wipe_all()
 
+        model.update()
         pygame.display.flip()
         clock.tick(25)
-    
     pygame.quit()
 
 if __name__ == "__main__":

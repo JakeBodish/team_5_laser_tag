@@ -21,9 +21,15 @@ class Model:
         #creates table if not there
         self._init_db()
 
-        #Teams
+        #Teams hardwareID:(playerID, codename)
         self.red_team = {}
         self.green_team = {}
+
+        #Timer and Game settings
+        self.start_30s_timer = True
+        self.playing = True
+        self.start_time = 0
+        self.time_left = 0
 
     def _connect(self):
         #connection to database
@@ -40,16 +46,46 @@ class Model:
                 )
             """)
             con.commit()
-            
+
+    def check_if_player_already_exists(self, player_id: int, equipment_id: int):
+        for equip_id in self.red_team:
+            p_id = self.red_team[equip_id][0]
+            if player_id == p_id:
+                print("player already on red team!")
+                return False
+            if equip_id == equipment_id:
+                print("equipment number is already taken!")
+                return False
+
+        for equip_id in self.green_team:
+            p_id = self.green_team[equip_id][0]
+            if player_id == p_id:
+                print("player already on green team!")
+                return False
+            if equip_id == equipment_id:
+                print("equipment number is already taken!")
+                return False
+
+        return True
+
             
     #database operations
     def add_player_to_game(self, player_id: int, equipment_id: int, team: str):
 		#add player to game memory
         name = self.get_player_name(player_id)
         if team == "RED":
-            self.red_team[equipment_id] = (player_id,name)
+            if(self.check_if_player_already_exists(player_id, equipment_id)):
+                self.red_team[equipment_id] = (player_id,name)
+                return True
+            else:
+                return False
         else:
-            self.green_team[equipment_id] = (player_id,name)
+            if(self.check_if_player_already_exists(player_id, equipment_id)):
+                self.green_team[equipment_id] = (player_id,name)
+                return True
+            else:
+                return False
+
     def add_player_to_database(self, player_id: int, name: str):
         #add player_id and codename to database for future use
         if name == "":
@@ -73,7 +109,7 @@ class Model:
         #delete player by ID
         with self._connect() as con:
             cur = con.cursor()
-            cur.execute("delete from players where equipment_id = ?", (equipment_id,))
+            cur.execute("delete from players where equipment_id =  ?", (equipment_id,))
             con.commit()
             return cur.rowcount > 0
 
@@ -82,15 +118,59 @@ class Model:
         with self._connect() as con:
             cur = con.cursor()
             try:
-                cur.execute("SELECT name from players where player_id = ?", (player_id))
-            except:
-                return ""
+                cur.execute("SELECT name from players where player_id =  ?", (player_id,))
+            except Exception as e:
+                print(e)
             name = str(cur.fetchone())
-        return name
+        return name.strip("()'',")
 
     def wipe_all(self):
-        #removes all players from database
-        with self._connect() as con:
-            cur = con.cursor()
-            cur.execute("DELETE FROM players")
-            con.commit()
+        self.red_team = {}
+        self.green_team = {}
+    
+    # A function so the View can grab the amount of time left in the game
+    def get_time_left(self):
+        current_time = pygame.time.get_ticks()
+        time_remaining = int((self.time_left - (current_time - self.start_time)) / 1000)
+        minutes = int((time_remaining) / 60)
+        seconds = time_remaining % 60
+        if seconds < 10:
+            return (str(minutes) + ":0" + str(seconds))
+        else: 
+            return (str(minutes) + ":" + str(seconds))
+        
+    #A function to clear all player entries on player entry screen -> f12
+    def clear_player_entries(self):
+        self.red_team.clear()
+        self.green_team.clear()
+        print("Players cleared")
+
+
+    #update function
+    def update(self):
+        #Start 30 second timer before entering game
+        if(self.start_30s_timer and not self.playing):
+            self.start_time = pygame.time.get_ticks()
+            self.time_left = 30000 #30 seconds
+            self.start_30s_timer = False
+            print("Set 30 second timer")
+            return
+
+        #Calculate difference between current time and start time to see how much time has passed
+        current_time = pygame.time.get_ticks()
+        if(current_time - self.start_time > self.time_left):
+            if(not self.start_30s_timer and not self.playing):
+                print("30 seconds is up")
+                self.playing = True
+                self.start_time = pygame.time.get_ticks()
+                self.time_left = 360000
+            elif(not self.start_30s_timer and self.playing):
+                print("game is over")
+                self.playing = False
+                self.start_30s_timer = True
+
+        
+
+
+        
+        
