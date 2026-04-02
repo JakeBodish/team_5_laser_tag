@@ -2,6 +2,7 @@
 # model.py
 import sqlite3
 import pygame
+import random
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
@@ -25,11 +26,12 @@ class Model:
         self.red_team = {}
         self.green_team = {}
 
-        #Timer and Game settings
+        #Timer, Game, and Music settings
         self.start_30s_timer = True
         self.playing = True
         self.start_time = 0
         self.time_left = 0
+        self.music_playing = False
 
     def _connect(self):
         #connection to database
@@ -130,6 +132,8 @@ class Model:
     
     # A function so the View can grab the amount of time left in the game
     def get_time_left(self):
+        if(self.playing and self.start_30s_timer):
+            return "00:00"
         current_time = pygame.time.get_ticks()
         time_remaining = int((self.time_left - (current_time - self.start_time)) / 1000)
         minutes = int((time_remaining) / 60)
@@ -166,9 +170,22 @@ class Model:
                 self.time_left = 360000
             elif(not self.start_30s_timer and self.playing):
                 print("game is over")
-                self.playing = False
+                self.playing = True
                 self.start_30s_timer = True
+        elif(current_time - self.start_time >= 12000 and not self.music_playing):
+            self.play_music()
 
+    def play_music(self):
+        track_num = random.randint(1,8)
+        track_name = "Track0" + str(track_num) + ".mp3"
+
+        try:
+            pygame.mixer.music.load("photon_tracks/" + track_name)
+            pygame.mixer.music.play()
+            self.music_playing = True
+        except:
+            print("something went wrong in the music selection")
+            return 66
         
 
 

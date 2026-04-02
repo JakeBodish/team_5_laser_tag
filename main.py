@@ -5,6 +5,7 @@ from model import Model
 
 def main():
     pygame.init()
+    pygame.mixer.init()
     model = Model()
     view = Screen(model)
     controller = Controller(view, model)
