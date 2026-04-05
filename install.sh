@@ -1,13 +1,10 @@
 #!/usr/bin/env bash
 set -e
-
 # Simple installer for repository files and Python dependencies.
 # to run: "bash install.sh"
-
 PYTHON_BIN="${PYTHON_BIN:-python3}"
 REPO_URL="https://github.com/JakeBodish/team_5_laser_tag.git"
 TARGET_DIR="${TARGET_DIR:-team_5_laser_tag}"
-
 # Install git first.
 if command -v apt-get >/dev/null 2>&1; then
   sudo apt-get update
@@ -36,8 +33,10 @@ else
 fi
 
 echo "Using Python interpreter: $PYTHON_BIN"
-"$PYTHON_BIN" -m pip install --upgrade pip
-"$PYTHON_BIN" -m pip install pygame
+sudo apt install -y python3 python3-pip
+pip install pygame
+# "$PYTHON_BIN" -m pip install --upgrade pip
+# "$PYTHON_BIN" -m pip install pygame
 
 # socket, sqlite3, and queue are standard-library modules.
 # add more when necessary
