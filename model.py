@@ -3,6 +3,8 @@
 import sqlite3
 import pygame
 import random
+import psycopg2 as psycop
+from psycopg2 import sql
 from dataclasses import dataclass
 from typing import List, Optional, Tuple
 
@@ -17,10 +19,20 @@ class Player:
 class Model:
     #database linked to application
     def __init__(self, db_path: str = "players.db"):
-        #database file name
-        self.db_path = db_path
-        #creates table if not there
-        self._init_db()
+        self.vm_db = self.try_connect_to_vm_db()
+        if self.vm_db == True:
+            self.connect_params = {
+                "host" : "localhost",
+                "database" : "photon",
+                "user" : "student",
+                "password" : "student",
+                "port" : 5432
+            }
+        else:
+            #If connection to VM db fails connect to players.db
+            self.db_path = db_path
+            #creates table if not there
+            self._init_db()
 
         #Teams hardwareID:(playerID, codename)
         self.red_team = {}
@@ -33,6 +45,24 @@ class Model:
         self.time_left = 0
         self.music_playing = False
 
+    #attempts to connect to vm db, return true or false
+    def try_connect_to_vm_db(self):
+        try:
+            conn = psycop.connect(
+                host="localhost",
+                database="photon",
+                user="student",
+                password="student",
+                port="5432"
+            )
+            print("connected to VM database sucessfully")
+            conn.close()
+            return True
+        except Exception as e:
+            print("failed to connnect to VM database: " + str(e))
+            return False
+
+    #Connection for testing DB
     def _connect(self):
         #connection to database
         return sqlite3.connect(self.db_path)
@@ -89,6 +119,34 @@ class Model:
                 return False
 
     def add_player_to_database(self, player_id: int, name: str):
+        if self.vm_db:
+            return self.add_player_to_vm_db(player_id, name)
+        else:
+            return self.add_player_to_testing_db(player_id, name)
+
+
+    def add_player_to_vm_db(self, player_id: int, name: str):
+        if name == "":
+            print("name can not be empty")
+            return False, "Name cannot be empty"
+
+        try:
+            conn = psycop.connect(**self.connect_params)
+            cur = conn.cursor()
+
+            cur.execute(
+                "INSERT INTO players (id, codename) VALUES (%s, %s);",
+                (player_id, name)
+            )
+            conn.commit()
+            cur.close()
+            conn.close()
+            return True, "Player added"
+        except Exception as e:
+            return False
+
+
+    def add_player_to_testing_db(self, player_id: int, name: str):
         #add player_id and codename to database for future use
         if name == "":
             print("name can not be empty")
@@ -106,8 +164,31 @@ class Model:
             return True, "Player added"
         except sqlite3.IntegrityError:
             return False, f"PLayer ID already exists"
-            
+
     def delete_player(self, equipment_id: int) -> bool:
+        if self.vm_db:
+            return self.delete_player_from_vm_db(equipment_id)
+        else:
+            return self.delete_player_from_testing_db(equipment_id)
+
+    def delete_player_from_vm_db(self, id: int) -> bool:
+        try:
+            conn = psycop.connect(**self.connect_params)
+            cur = conn.cursor()
+
+            cur.execute(
+                "DELETE FROM players WHERE id = %s;",
+                (id,)
+            )
+            conn.commit()
+            rows = cur.rowcount > 0
+            cur.close()
+            conn.close()
+            return rows
+        except Exception as e:
+            print(str(e))
+            
+    def delete_player_from_testing_db(self, equipment_id: int) -> bool:
         #delete player by ID
         with self._connect() as con:
             cur = con.cursor()
@@ -115,7 +196,34 @@ class Model:
             con.commit()
             return cur.rowcount > 0
 
+
     def get_player_name(self, player_id):
+        if self.vm_db:
+            return self.get_player_from_vm_db(player_id)
+        else:
+            return self.get_player_from_testing_db(player_id)
+
+    def get_player_from_vm_db(self, player_id: int):
+        try:
+            conn = psycop.connect(**self.connect_params)
+            cur = conn.cursor()
+            cur.execute(
+                "SELECT codename FROM players WHERE id = %s;",
+                (player_id,)
+            )
+
+            result = cur.fetchone()
+            cur.close()
+            conn.close()
+            if result:
+                return result[0]
+            else:
+                return "None"
+                
+        except Exception as e:
+            print(str(e))
+
+    def get_player_from_testing_db(self, player_id: int):
         #gets list of players
         with self._connect() as con:
             cur = con.cursor()

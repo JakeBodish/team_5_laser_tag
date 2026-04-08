@@ -35,8 +35,8 @@ fi
 echo "Using Python interpreter: $PYTHON_BIN"
 sudo apt install -y python3 python3-pip
 pip install pygame
-# "$PYTHON_BIN" -m pip install --upgrade pip
-# "$PYTHON_BIN" -m pip install pygame
+pip install psycopg2-binary
+
 
 # socket, sqlite3, and queue are standard-library modules.
 # add more when necessary
