@@ -174,4 +174,8 @@ class Screen(): #testing commiting from terminal
         time_title = self.font.render(time_text, True, (255,255,255))
         self.screen.blit(time_title, (550, 760))
 
+        #draw instructions to exit action screen
+        exit_text = self.font.render("Press COMMA to return to entry screen after game end", True, (255,255,255))
+        self.screen.blit(exit_text, (15, 760))
+
         pygame.display.flip()

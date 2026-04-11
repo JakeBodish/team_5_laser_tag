@@ -144,6 +144,20 @@ class Controller():
                         self.view.play_screen = True
                         self.model.playing = False
                         self.model.start_30s_timer = True
+                    elif self.view.play_screen and self.model.game_over:
+                        self.view.play_screen = False
+                        self.view.entry_screen = True
+                        self.model.wipe_all()
+                        self.model.clear_player_entries()
+                        self.view.row = 0
+                        self.view.col = 0
+                        self.view.current_entry = ""
+                        self.view.last_entry = ""
+                        self.view.team = "RED"
+                        self.model.playing = True
+                        self.model.start_30s_timer = True
+                        self.model.game_over = False
+                        self.model.music_playing = False
 
                 if event.key == K_F12:
                     if self.view.entry_screen:
@@ -161,8 +175,8 @@ class Controller():
             prompt = "Input a new IP. Press ENTER when done. ESCAPE to cancel:"
             self.view.draw_prompt(prompt, self.ip_txt)
 
-        #Broadcast start code once 30s start timer is done:
-        if self.model.playing and not self.in_progress:
+        #Broadcast start code once the 30s start timer is done:
+        if self.model.playing and not self.model.start_30s_timer and not self.in_progress:
             self.start()
 
 		#Broadcast end game
@@ -178,6 +192,7 @@ class Controller():
     def start(self):
         #broadcast game start code
         self.broadcast("202")
+        print("202 broadcasted, game starting")
         self.in_progress = True
 
         self.stop_event.clear()
@@ -188,6 +203,9 @@ class Controller():
     def end(self):
         #broadcast game end code
         self.broadcast("221")
+        self.broadcast("221")
+        self.broadcast("221")
+        print("221 broadcasted thrice, game ending")
         self.in_progress = False
         self.stop_event.set()
 

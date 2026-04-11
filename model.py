@@ -41,6 +41,7 @@ class Model:
         #Timer, Game, and Music settings
         self.start_30s_timer = True
         self.playing = True
+        self.game_over = False
         self.start_time = 0
         self.time_left = 0
         self.music_playing = False
@@ -261,6 +262,9 @@ class Model:
     #update function
     def update(self):
         #Start 30 second timer before entering game
+        if self.game_over:
+            return
+
         if(self.start_30s_timer and not self.playing):
             self.start_time = pygame.time.get_ticks()
             self.time_left = 30000 #30 seconds
@@ -278,8 +282,10 @@ class Model:
                 self.time_left = 360000
             elif(not self.start_30s_timer and self.playing):
                 print("game is over")
-                self.playing = True
-                self.start_30s_timer = True
+                self.playing = False
+                self.game_over = True
+                self.start_30s_timer = False
+                return
         elif(current_time - self.start_time >= 12000 and not self.music_playing):
             self.play_music()
 
