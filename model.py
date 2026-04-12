@@ -257,8 +257,56 @@ class Model:
         self.red_team.clear()
         self.green_team.clear()
         print("Players cleared")
+	
+    def process_hit(self, player1, player2):
+        redbase = '53'
+        greenbase = '43'
+        player1_team = 0 # red team = 0, green team = 1
+        player2_team = 0
 
+        if player1 in self.red_team.keys():
+            player1_team = 0
+        else:
+            player1_team = 1
 
+        if player2 == redbase:
+            if player1_team == 1: #recieve 100 points
+                self.scores[player1_team][player1] += 100
+            #add symbol to their name on scoreboard
+            return [redbase] #not sure what to return for base hit
+        elif player2 == greenbase:
+            if player1_team == 0:
+                self.scores[player1_team][player1] += 100
+            #add symbol to their name on scoreboard
+            return [greenbase]
+        elif player2 in self.red_team.keys():
+            player2_team = 0
+        else:
+            player2_team = 1
+
+        if player1_team == player2_team: #-10 each
+            self.scores[player1_team][player1] -= 10
+            self.scores[player2_team][player2] -= 10
+            return [str(player1), str(player2)]
+        else: #+10/-10
+            self.scores[player1_team][player1] += 10
+            self.scores[player2_team][player2] -= 10
+            return [str(player2)]
+	
+    def reset_scores(self):
+        self.scores = [{player:0 for player in self.red_team.keys()},{player:0 for player in self.green_team.keys()}]
+        self.hit_base = []
+    
+    def get_team_score(self, team):
+        score = 0
+        if team == 'RED':
+            for _, player_score in self.scores[0].items():
+                score += player_score
+        else:
+            for _, player_score in self.scores[1].items():
+                score += player_score
+        return score
+        
     #update function
     def update(self):
         #Start 30 second timer before entering game

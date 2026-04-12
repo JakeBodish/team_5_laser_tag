@@ -156,17 +156,24 @@ class Screen(): #testing commiting from terminal
 
          # Draw the currently entered players for each team on the action screen.
         red_y = 45
-        for player_id, name in self.model.red_team.values():
+        for equip_id, (player_id, name) in self.model.red_team.items():
             red_text = self.font.render(str(name), True, (255,0,0))
             self.screen.blit(red_text, (100, red_y))
+            red_text = self.font.render(str(self.model.scores[0][equip_id]), True, (255,0,0))
+            self.screen.blit(red_text, (250, red_y))
             red_y += 20
+        red_text = self.font.render(str(self.model.get_team_score('RED')), True, (255,0,0))
+        self.screen.blit(red_text, (250, 370))
 
         green_y = 45
-        for player_id, name in self.model.green_team.values():
+        for equip_id, (player_id, name) in self.model.green_team.items():
             green_text = self.font.render(str(name), True, (0,255,0))
             self.screen.blit(green_text, (600, green_y))
+            green_text = self.font.render(str(self.model.scores[1][equip_id]), True, (0,255,0))
+            self.screen.blit(green_text, (500, green_y))
             green_y += 20
-
+        green_text = self.font.render(str(self.model.get_team_score('GREEN')), True, (0,255,0))
+        self.screen.blit(green_text, (500, 370))
 
         #calculate time left in game
         time_left = self.model.get_time_left()

@@ -144,6 +144,7 @@ class Controller():
                         self.view.play_screen = True
                         self.model.playing = False
                         self.model.start_30s_timer = True
+                        self.model.reset_scores()
                     elif self.view.play_screen and self.model.game_over:
                         self.view.play_screen = False
                         self.view.entry_screen = True
@@ -182,6 +183,19 @@ class Controller():
 		#Broadcast end game
         elif not self.model.playing and self.in_progress:
             self.end()
+            
+        #Proccess incoming data
+        while not self.data_in_buffer.empty():
+            data, _ = self.data_in_buffer.get()
+            data = data.decode('utf-8')
+            split_idx = data.index(":")
+            player1 = data[:split_idx]
+            player2 = data[split_idx+1:]
+            data_to_transmit = self.model.process_hit(player1, player2)   
+            while len(data_to_transmit) > 0:
+                self.broadcast(data_to_transmit.pop(0))
+         
+            
     #udp functions
     def broadcast(self, msg):
         self.UDPOutgoingSocket.sendto(

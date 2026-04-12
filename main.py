@@ -15,10 +15,8 @@ def main():
         view.update()
         events = pygame.event.get()
         controller.process_events(events)
-        #start game
-        if controller.request_start:
-            controller.start()
-            controller.request_start = False
+        
+        
         #wipe database
         if controller.request_wipe:
             controller.request_wipe = False
