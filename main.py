@@ -14,16 +14,7 @@ def main():
     while controller.running:
         view.update()
         events = pygame.event.get()
-        controller.process_events(events)
-        
-        
-        #wipe database
-        if controller.request_wipe:
-            controller.request_wipe = False
-            controller.end()
-            model.clear_player_entries()
-            model.wipe_all()
-
+        controller.update(events)
         model.update()
         pygame.display.flip()
         clock.tick(25)

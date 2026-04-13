@@ -37,6 +37,7 @@ class Model:
         #Teams hardwareID:(playerID, codename)
         self.red_team = {}
         self.green_team = {}
+        self.hit_base = []
 
         #Timer, Game, and Music settings
         self.start_30s_timer = True
@@ -251,12 +252,6 @@ class Model:
             return (str(minutes) + ":0" + str(seconds))
         else: 
             return (str(minutes) + ":" + str(seconds))
-        
-    #A function to clear all player entries on player entry screen -> f12
-    def clear_player_entries(self):
-        self.red_team.clear()
-        self.green_team.clear()
-        print("Players cleared")
 	
     def process_hit(self, player1, player2):
         redbase = '53'
@@ -272,12 +267,13 @@ class Model:
         if player2 == redbase:
             if player1_team == 1: #recieve 100 points
                 self.scores[player1_team][player1] += 100
+                self.hit_base.append(player1)
             #add symbol to their name on scoreboard
             return [redbase] #not sure what to return for base hit
         elif player2 == greenbase:
             if player1_team == 0:
                 self.scores[player1_team][player1] += 100
-            #add symbol to their name on scoreboard
+                self.hit_base.append(player1)
             return [greenbase]
         elif player2 in self.red_team.keys():
             player2_team = 0
@@ -287,11 +283,11 @@ class Model:
         if player1_team == player2_team: #-10 each
             self.scores[player1_team][player1] -= 10
             self.scores[player2_team][player2] -= 10
-            return [str(player1), str(player2)]
+            return [player1, player2]
         else: #+10/-10
             self.scores[player1_team][player1] += 10
             self.scores[player2_team][player2] -= 10
-            return [str(player2)]
+            return [player2]
 	
     def reset_scores(self):
         self.scores = [{player:0 for player in self.red_team.keys()},{player:0 for player in self.green_team.keys()}]
