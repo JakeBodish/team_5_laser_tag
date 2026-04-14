@@ -124,11 +124,10 @@ class Controller():
 
                 if event.key == K_COMMA:
                     if(self.view.entry_screen):
-                        self.view.entry_screen = False
-                        self.view.play_screen = True
                         self.model.playing = False
                         self.model.start_30s_timer = True
                         self.model.reset_scores()
+                        self.view.enter_action_screen()
                     elif self.view.play_screen and self.model.game_over:
                         self.view.play_screen = False
                         self.view.entry_screen = True

@@ -244,4 +244,8 @@ class Screen(): #testing commiting from terminal
         if len(self.game_actions) > 13:
             self.game_actions.pop()
 
-	
+    def enter_action_screen(self):
+        self.game_actions.clear()
+        self.entry_screen = False
+        self.play_screen = True
+        
