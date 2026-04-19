@@ -20,6 +20,7 @@ class Screen(): #testing commiting from terminal
         self.red_players = [{"player_id": "", "equipment_id": ""} for _ in range(20)]
         self.green_players = [{"player_id": "", "equipment_id": ""} for _ in range(20)]
         self.entry_screen_options = []
+        self.game_actions = []
         #current selection
         self.team = "RED"
         self.current_entry = ""
@@ -27,7 +28,7 @@ class Screen(): #testing commiting from terminal
         self.row = 0
         self.col = 0
         self.font = pygame.font.SysFont(None, 24)
-
+        self.base_icon = pygame.transform.scale(pygame.image.load('baseicon.jpg'), (30,17))
         #Initilize text
         self.init_entry_options()
 
@@ -153,25 +154,98 @@ class Screen(): #testing commiting from terminal
         action_title = self.font.render("Current Game Action", True, (255,255,255))
         self.screen.blit(score_title, (335, 10))
         self.screen.blit(action_title, (325, 415))
-
-         # Draw the currently entered players for each team on the action screen.
-        red_y = 45
-        for player_id, name in self.model.red_team.values():
-            red_text = self.font.render(str(name), True, (255,0,0))
-            self.screen.blit(red_text, (100, red_y))
-            red_y += 20
-
-        green_y = 45
-        for player_id, name in self.model.green_team.values():
-            green_text = self.font.render(str(name), True, (0,255,0))
-            self.screen.blit(green_text, (600, green_y))
-            green_y += 20
-
-
         #calculate time left in game
         time_left = self.model.get_time_left()
         time_text = ("Time Remaining: " + str(time_left))
         time_title = self.font.render(time_text, True, (255,255,255))
         self.screen.blit(time_title, (550, 760))
+        
+        # Draw the currently entered players for each team on the action screen.
+        red_y = 45
+        team = []
+        for equip_id, (player_id, name) in self.model.red_team.items():
+            team.append((self.model.scores[0][equip_id], equip_id, name))
+        team = sorted(team, reverse=True)
+        for score, equip_id, name in team:
+            red_text = self.font.render(str(name), True, (255,0,0))
+            self.screen.blit(red_text, (100, red_y))
+            red_text = self.font.render(str(self.model.scores[0][equip_id]), True, (255,0,0))
+            self.screen.blit(red_text, (250, red_y))
+            if equip_id in self.model.hit_base:
+                self.screen.blit(self.base_icon, (55, red_y))
+            red_y += 20
 
-        pygame.display.flip()
+        green_y = 45
+        team = []
+        for equip_id, (player_id, name) in self.model.green_team.items():
+            team.append((self.model.scores[1][equip_id], equip_id, name))
+        team = sorted(team, reverse=True)
+        for score, equip_id, name in team:
+            green_text = self.font.render(str(name), True, (0,255,0))
+            self.screen.blit(green_text, (600, green_y))
+            green_text = self.font.render(str(self.model.scores[1][equip_id]), True, (0,255,0))
+            self.screen.blit(green_text, (500, green_y))
+            if equip_id in self.model.hit_base:
+                self.screen.blit(self.base_icon, (710, green_y))
+            green_y += 20
+            
+            
+            
+        green_score = self.model.get_team_score('GREEN')
+        green_text = self.font.render(str(green_score), True, (0,255,0))
+       
+        red_score = self.model.get_team_score('RED')
+        red_text = self.font.render(str(red_score), True, (255,0,0))
+        #flashing score
+        if red_score > green_score:
+            if int(time_left[time_left.index(':')+1:]) % 2 == 1:
+                self.screen.blit(red_text, (250, 370))
+            self.screen.blit(green_text, (500, 370))
+        elif green_score > red_score:
+            if int(time_left[time_left.index(':')+1:]) % 2 == 1:
+                self.screen.blit(green_text, (500, 370))
+            self.screen.blit(red_text, (250, 370))
+        else:
+            self.screen.blit(red_text, (250, 370))
+            self.screen.blit(green_text, (500, 370))
+		
+		
+		#print game actions 
+        for i in range(len(self.game_actions)):
+            text, team = self.game_actions[i]
+            color = (255,0,0) if team == 'RED' else (0,255,0)
+            text_render = self.font.render(text, True, color)
+            self.screen.blit(text_render, (150, 430+(i*25)))
+        
+
+        #draw instructions to exit action screen
+        exit_text_render = self.font.render("Press COMMA to return to entry screen after game end", True, (255,255,255))
+        self.screen.blit(exit_text_render, (15, 760))
+		
+        #pygame.display.flip()
+
+    def add_game_action(self, player1, player2):
+        redbase = '53'
+        greenbase = '43'
+        player1_team = 'RED' if player1 in self.model.red_team.keys() else 'GREEN'
+        player2_team = 'RED' if player2 in self.model.red_team.keys() else 'GREEN'
+	
+	
+        player1_name = self.model.red_team[player1][1] if player1_team == 'RED' else self.model.green_team[player1][1]
+        if player2 == greenbase:
+            player2_name = 'Green Base'
+        elif player2 == redbase:
+            player2_name = 'Red Base'
+        else:
+            player2_name = self.model.red_team[player2][1] if player2_team == 'RED' else self.model.green_team[player2][1]
+	
+        txt = player1_name + " has hit " + player2_name+"!"
+        self.game_actions.insert(0,(txt,player1_team))
+        if len(self.game_actions) > 13:
+            self.game_actions.pop()
+
+    def enter_action_screen(self):
+        self.game_actions.clear()
+        self.entry_screen = False
+        self.play_screen = True
+        

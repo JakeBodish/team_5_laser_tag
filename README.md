@@ -32,4 +32,3 @@ Sprint4:
 8. Press F2 to configure server IP 
 9. Press COMMA to enter action screen and begin game start countdown
 10. Press F12 to clear entries from player entry screen
-

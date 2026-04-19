@@ -50,7 +50,7 @@ class Controller():
         self.usr_txt = ""
 
     #event processing	
-    def process_events(self, events):
+    def update(self, events):
         for event in events:
             if event.type == QUIT:
                 self.running = False
@@ -114,24 +114,8 @@ class Controller():
                         if event.unicode.isdigit():
                             self.usr_txt += event.unicode
                 #if typing playerId, switching between fields in player entry   
-                elif self.view.entry_screen: # player entry
-                    if event.key == K_TAB: # Switch fields
-
-                        self.player_id = self.usr_txt
-                        self.name = self.model.get_player_name(self.player_id)
-                        if self.name == "None":
-                            self.new_name = True
-                        self.view.last_entry = self.player_id
-                        self.equip_id = True
-                        self.usr_txt = ""
-                        continue
-
-                    elif event.key == K_BACKSPACE:
-                        self.usr_txt = self.usr_txt[:-1]
-                    else:
-                        if event.unicode.isdigit():
-                            self.usr_txt += ""+event.unicode
-                    self.view.current_entry = self.usr_txt
+                elif self.view.entry_screen:
+                    self.playerid_entry_events(event)
 
             if event.type == KEYUP:
                 if event.key == K_F2:
@@ -140,17 +124,29 @@ class Controller():
 
                 if event.key == K_COMMA:
                     if(self.view.entry_screen):
-                        self.view.entry_screen = False
-                        self.view.play_screen = True
                         self.model.playing = False
                         self.model.start_30s_timer = True
+                        self.model.reset_scores()
+                        self.view.enter_action_screen()
+                    elif self.view.play_screen and self.model.game_over:
+                        self.view.play_screen = False
+                        self.view.entry_screen = True
+                        self.view.row = 0
+                        self.view.col = 0
+                        self.view.current_entry = ""
+                        self.view.last_entry = ""
+                        self.view.team = "RED"
+                        self.model.playing = True
+                        self.model.start_30s_timer = True
+                        self.model.game_over = False
+                        self.model.music_playing = False
 
                 if event.key == K_F12:
                     if self.view.entry_screen:
                         self.model.wipe_all() # Wipe teams
                         self.view.row = 0 # Reset index for player entry screen
                         self.view.col = 0
-
+		#prompts
         if self.new_name:
             prompt = "New Player ID detected, input new codename. Press ENTER to save:"
             self.view.draw_prompt(prompt, self.usr_txt)            
@@ -161,13 +157,49 @@ class Controller():
             prompt = "Input a new IP. Press ENTER when done. ESCAPE to cancel:"
             self.view.draw_prompt(prompt, self.ip_txt)
 
-        #Broadcast start code once 30s start timer is done:
-        if self.model.playing and not self.in_progress:
+        #Broadcast start code once the 30s start timer is done:
+        if self.model.playing and not self.model.start_30s_timer and not self.in_progress:
             self.start()
 
 		#Broadcast end game
         elif not self.model.playing and self.in_progress:
             self.end()
+            
+        
+        self.process_incoming_data()
+    def playerid_entry_events(self, event):
+        if event.key == K_TAB:
+
+            self.player_id = self.usr_txt
+            if self.usr_txt == '':
+                return
+            self.name = self.model.get_player_name(self.player_id)
+            if self.name == "None":
+                self.new_name = True
+            self.view.last_entry = self.player_id
+            self.equip_id = True
+            self.usr_txt = ""
+            return
+
+        elif event.key == K_BACKSPACE:
+            self.usr_txt = self.usr_txt[:-1]
+        else:
+            if event.unicode.isdigit():
+                self.usr_txt += ""+event.unicode
+        self.view.current_entry = self.usr_txt
+        return
+		
+    def process_incoming_data(self):
+        while not self.data_in_buffer.empty():
+            data, _ = self.data_in_buffer.get()
+            data = data.decode('utf-8')
+            split_idx = data.index(":")
+            player1 = data[:split_idx]
+            player2 = data[split_idx+1:]
+            data_to_transmit = self.model.process_hit(player1, player2)
+            self.view.add_game_action(player1, player2)   
+            while len(data_to_transmit) > 0:
+                self.broadcast(data_to_transmit.pop(0))        
     #udp functions
     def broadcast(self, msg):
         self.UDPOutgoingSocket.sendto(
@@ -178,6 +210,7 @@ class Controller():
     def start(self):
         #broadcast game start code
         self.broadcast("202")
+        print("202 broadcasted, game starting")
         self.in_progress = True
 
         self.stop_event.clear()
@@ -188,6 +221,9 @@ class Controller():
     def end(self):
         #broadcast game end code
         self.broadcast("221")
+        self.broadcast("221")
+        self.broadcast("221")
+        print("221 broadcasted thrice, game ending")
         self.in_progress = False
         self.stop_event.set()
 

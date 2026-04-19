@@ -5,6 +5,7 @@ from model import Model
 
 def main():
     pygame.init()
+    pygame.mixer.init()
     model = Model()
     view = Screen(model)
     controller = Controller(view, model)
@@ -13,18 +14,7 @@ def main():
     while controller.running:
         view.update()
         events = pygame.event.get()
-        controller.process_events(events)
-        #start game
-        if controller.request_start:
-            controller.start()
-            controller.request_start = False
-        #wipe database
-        if controller.request_wipe:
-            controller.request_wipe = False
-            controller.end()
-            model.clear_player_entries()
-            model.wipe_all()
-
+        controller.update(events)
         model.update()
         pygame.display.flip()
         clock.tick(25)
