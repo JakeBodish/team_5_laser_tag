@@ -242,19 +242,16 @@ class Model:
     
     # A function so the View can grab the amount of time left in the game
     def get_time_left(self):
-    if self.game_over:
-        return "00:00"
+        if self.game_over:
+            return "00:00"
 
-    if self.playing and self.start_30s_timer:
-        return "00:00"
+        current_time = pygame.time.get_ticks()
+        time_remaining = max(0, int((self.time_left - (current_time - self.start_time)) / 1000))
 
-    current_time = pygame.time.get_ticks()
-    time_remaining = max(0, int((self.time_left - (current_time - self.start_time)) / 1000))
+        minutes = time_remaining // 60
+        seconds = time_remaining % 60
 
-    minutes = time_remaining // 60
-    seconds = time_remaining % 60
-
-    return f"{minutes:02}:{seconds:02}"
+        return f"{minutes:02}:{seconds:02}"
 	
     def process_hit(self, player1, player2):
         redbase = '53'
@@ -289,7 +286,7 @@ class Model:
             return [player1, player2]
         else: #+10/-10
             self.scores[player1_team][player1] += 10
-            self.scores[player2_team][player2] -= 10
+            #self.scores[player2_team][player2] -= 10
             return [player2]
 	
     def reset_scores(self):
